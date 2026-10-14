@@ -7,15 +7,18 @@ const AddAddress = async (req, res) => {
     try {
         const user = req?.user?.id;
 
-        const existaddress = await AddressModel.findOne({ building_number });
-
-        if (existaddress) {
-            return res.status(409).json({ success: false, message: "address already exist !!!" });
-        }
-
         if (!user) {
             return res.status(401).json({ success: false, message: "User not Unauthorized !!!" });
         }
+
+        // Check duplicate only within this user's addresses
+        const existaddress = await AddressModel.findOne({ userId: user, building_number });
+
+        if (existaddress) {
+            return res.status(409).json({ success: false, message: "You already have an address with this building number !" });
+        }
+
+
 
         if (!full_name || full_name.trim() === "") {
             return res.status(400).json({ success: false, message: "full name is required !!!" });
@@ -131,14 +134,26 @@ const Updateaddress = async (req, res) => {
     try {
         const user = req?.user?.id;
 
-        const address = await AddressModel.findById(id);
-
-        if (!address) {
-            return res.status(404).json({ success: false, message: "Address not avaibale !!!" });
+        if (!user) {
+            return res.status(401).json({ success: false, message: "User not authorized !!!" });
         }
 
-        if (!user) {
-            return res.status(400).json({ success: false, message: "User not authorized !!!" });
+        const address = await AddressModel.findOne({ _id: id, userId: user });
+
+        if (!address) {
+            return res.status(404).json({ success: false, message: "Address not found or you are not authorized !" });
+        }
+
+        // Check duplicate building_number only within this user's other addresses
+        if (building_number) {
+            const duplicateAddress = await AddressModel.findOne({
+                userId: user,
+                building_number,
+                _id: { $ne: id }
+            });
+            if (duplicateAddress) {
+                return res.status(409).json({ success: false, message: "You already have an address with this building number !" });
+            }
         }
 
         let updatedata = {};
