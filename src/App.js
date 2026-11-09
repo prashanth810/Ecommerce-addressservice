@@ -16,7 +16,8 @@ const app = express();
 
 // Render (and most hosts) put a proxy in front of the app.
 // Without this, req.ip is the proxy's IP, so every user shares ONE rate-limit bucket.
-app.set("trust proxy", 1);
+// 1 = direct from Render. Set TRUST_PROXY=2 when requests are forwarded by the payment service.
+app.set("trust proxy", Number(process.env.TRUST_PROXY) || 1);
 
 app.use(express.json({ limit: "10mb" }));
 app.use(express.urlencoded({ extended: true, limit: "10mb" }));
