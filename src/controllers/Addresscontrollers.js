@@ -36,6 +36,10 @@ const AddAddress = async (req, res) => {
             return res.status(400).json({ success: false, message: "street is required !!!" });
         }
 
+        if (!landmark || landmark.trim() === "") {
+            return res.status(400).json({ success: false, message: "land mark is required !!!" });
+        }
+
         if (!pincode || pincode.trim() === "") {
             return res.status(400).json({ success: false, message: "Pincode is required" });
         }
@@ -106,7 +110,7 @@ const Deleteaddress = async (req, res) => {
             return res.status(401).json({ success: false, message: "User not found unauthorized !!" });
         }
 
-        const address = await AddressModel.findOneAndDelete({ _id: id, userId: user });
+        const address = await AddressModel.findByIdAndDelete({ _id: id, userId: user });
 
         if (!address) {
             return res.status(404).json({ success: false, message: "Address not found or you are not authorized to delete this address !!" });
@@ -118,9 +122,6 @@ const Deleteaddress = async (req, res) => {
 
     }
     catch (error) {
-        if (error.name === "CastError") {
-            return res.status(400).json({ success: false, message: "Invalid address id" });
-        }
         return res.status(500).json({ success: false, message: error.message });
     }
 }
@@ -161,7 +162,7 @@ const Updateaddress = async (req, res) => {
         if (phone) updatedata.phone = phone;
         if (building_number) updatedata.building_number = building_number;
         if (street) updatedata.street = street;
-        if (landmark !== undefined) updatedata.landmark = landmark;
+        if (landmark) updatedata.landmark = landmark;
         if (city) updatedata.city = city;
         if (state) updatedata.state = state;
         if (pincode) updatedata.pincode = pincode;

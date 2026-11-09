@@ -30,6 +30,16 @@ app.get("/", (req, res) => {
     return res.status(200).json({
         success: true,
         message: "From address backend !!!",
+        service: process.env.SERVICE_NAME || "address-service",
+        base: API_BASE,
+        routes: [
+            `POST   ${API_BASE}/address/add`,
+            `GET    ${API_BASE}/address/all`,
+            `GET    ${API_BASE}/address/:id`,
+            `PUT    ${API_BASE}/address/update/:id`,
+            `DELETE ${API_BASE}/address/delete/:id`,
+            `PUT    ${API_BASE}/address/make-default`,
+        ],
     });
 });
 
