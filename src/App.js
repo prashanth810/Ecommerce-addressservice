@@ -5,6 +5,8 @@ import Envs from "./utils/Envs.js";
 import ConnecionDB from "./config/ConnecionDB.js";
 import Addressroute from "./routes/Addressroutes.js";
 import startGrpcServer from "./grpc/grpcServer.js";
+import healthRouter from "./health/health.routes.js";
+import { startKeepAlive } from "./health/keepAlive.js";
 
 
 const PORT = Envs.PORT;
@@ -23,6 +25,8 @@ app.get("/", (req, res) => {
 // address routes 
 app.use("/api/auth/v4", Addressroute);
 
+app.use("/health", healthRouter);
+
 
 
 
@@ -32,6 +36,7 @@ ConnecionDB().then(() => {
     })
     // gRPC server (used by the payment / order service)
     startGrpcServer();
+    startKeepAlive();
 })
     .catch((error) => {
         console.log("server failed connect !!!");
