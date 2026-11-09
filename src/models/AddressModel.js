@@ -29,7 +29,7 @@ const AddressSchema = new mongoose.Schema({
     landmark: {
         type: String,
         trim: true,
-        required: true,
+        default: "",
     },
     city: {
         type: String,
